@@ -16,7 +16,7 @@
 # Copyright 2017 Red Hat, Inc.
 #
 
-FROM fedora:28
+FROM fedora:29
 
 LABEL maintainer="The KubeVirt Project <kubevirt-dev@googlegroups.com>"
 ENV container docker
