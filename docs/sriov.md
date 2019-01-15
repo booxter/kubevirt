@@ -76,6 +76,10 @@ KERNEL=="kvm", GROUP="root", MODE="0666"
 $ udevadm control --reload-rules && udevadm trigger
 ```
 
+Finally, we need to unbind each device from its respective network driver and
+register it with vfio subsystem. You can find an example on how to do it under:
+tools/util/vfio.sh
+
 Now you are ready to set up your cluster.
 
 # Set up kubernetes cluster
