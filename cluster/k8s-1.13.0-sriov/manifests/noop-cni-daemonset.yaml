@@ -2,17 +2,17 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: kube-sriov-cni-ds-amd64
+  name: kube-noop-cni-ds-amd64
   namespace: kube-system
   labels:
     tier: node
-    app: sriov-cni
+    app: noop-cni
 spec:
   template:
     metadata:
       labels:
         tier: node
-        app: sriov-cni
+        app: noop-cni
     spec:
       hostNetwork: true
       nodeSelector:
@@ -22,8 +22,10 @@ spec:
           operator: Exists
           effect: NoSchedule
       containers:
-        - name: kube-sriov-cni
-          image: nfvpe/sriov-cni:latest
+        - name: kube-noop-cni
+          image: centos:latest
+          command: ["/bin/sh"]
+          args: ["-c", "echo '#!/bin/sh\necho \"{\\\"result\\\": []}\"' > /host/opt/cni/bin/noop; chmod +x /host/opt/cni/bin/noop; sleep infinity"]
           securityContext:
             privileged: true
           resources:

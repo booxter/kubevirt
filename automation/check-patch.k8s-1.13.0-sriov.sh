@@ -53,39 +53,10 @@ while [ -n "$(kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config get pods --al
     sleep 10
 done
 
-# move all VF netlink interfaces into kube-master
-# ===============================================
-devs=($(ls /sys/class/net))
-pfs=()
-vfs=()
+# Enable VFIO for all SR-IOV network devices
+./tools/util/vfio.sh
 
-for dev in ${devs[@]}; do
-  if [[ -f "/sys/class/net/$dev/device/sriov_numvfs" ]]; then
-    pfs+=($dev)
-    devfiles=($(ls /sys/class/net/$dev/device/))
-    for devfile in ${devfiles[@]}; do
-       if [[ $devfile == virtfn* ]]; then
-          vfnic=$(ls /sys/class/net/$dev/device/$devfile/net) || true
-          if [ ! -z $vfnic ]; then
-            vfs+=($vfnic)
-          fi
-       fi
-    done
-  fi
-done
-
-DOCKER_NAMESPACE=`docker inspect kube-master | grep netns | tr "/" " "  | awk '{print substr($7, 1, length($7)-2)}'`
-
-for ifc in ${vfs[@]}; do
-   ip link set $ifc netns ${DOCKER_NAMESPACE}
-done
-
-for ifc in ${pfs[@]}; do
-   ip link set $ifc netns ${DOCKER_NAMESPACE}
-done
-# ===============================================
-
-#deploy multus
+# deploy multus
 kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/multus.yaml
 
 # configure sriov device plugin
@@ -94,7 +65,7 @@ docker exec kube-master ./automation/configure_sriovdp.sh
 # deploy sriov services
 kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/sriov-crd.yaml
 kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/sriovdp-daemonset.yaml
-kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/sriov-cni-daemonset.yaml
+kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/noop-cni-daemonset.yaml
 sleep 10
 
 # Make sure all containers are ready
