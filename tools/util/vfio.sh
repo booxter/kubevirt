@@ -12,6 +12,7 @@ for file in $(find /sys/devices/ -name *sriov_totalvfs*); do
     pfroot=$(dirname $file)
 
     # enable all available VFs
+    echo 0 > $pfroot/sriov_numvfs
     cat $file > $pfroot/sriov_numvfs
 
     # bind all VFs with vfio
