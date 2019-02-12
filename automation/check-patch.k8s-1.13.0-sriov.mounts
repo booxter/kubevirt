@@ -7,3 +7,5 @@
 
 /dev/vfio:/dev/vfio
 /sys/bus/pci/devices:/sys/bus/pci/devices
+/sys/bus/pci/drivers:/sys/bus/pci/drivers
+/lib/modules:/lib/modules
