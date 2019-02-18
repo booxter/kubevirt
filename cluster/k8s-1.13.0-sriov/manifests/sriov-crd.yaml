@@ -6,7 +6,7 @@ metadata:
     k8s.v1.cni.cncf.io/resourceName: intel.com/sriov
 spec:
   config: '{
-  "type": "noop",
+  "type": "sriov",
   "name": "sriov-network",
   "ipam": {
     "type": "host-local",

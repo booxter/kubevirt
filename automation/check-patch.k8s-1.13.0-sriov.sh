@@ -14,7 +14,7 @@ function finish {
 docker run --rm -e KUBEVIRT_FOLDER=${KUBEVIRT_FOLDER} -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`:/kubevirt -v ${KUBEVIRT_FOLDER}/cluster/k8s-1.13.0-sriov:/root/.kube/ --network host -t sebassch/centos-docker-client clean
 }
 
-trap finish EXIT
+#trap finish EXIT
 
 # serialize all SR-IOV jobs running on the same node
 [ -d "${SHARED_DIR}" ] || mkdir -p "${SHARED_DIR}"
@@ -56,7 +56,24 @@ done
 # Enable VFIO for all SR-IOV network devices
 ./tools/util/vfio.sh
 
-# deploy multus
+ln -s /run/docker/netns/ /var/run/netns
+
+# (re)enable all VFs
+# ==================
+devs=($(ls /sys/class/net))
+
+for dev in ${devs[@]}; do
+  if [[ -f "/sys/class/net/$dev/device/sriov_numvfs" ]]; then
+    echo 0 > "/sys/class/net/$dev/device/sriov_numvfs"
+    cat "/sys/class/net/$dev/device/sriov_totalvfs" > "/sys/class/net/$dev/device/sriov_numvfs"
+  fi
+done
+
+sleep 10
+
+modprobe vfio-pci
+
+#deploy multus
 kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/multus.yaml
 
 # configure sriov device plugin
@@ -65,7 +82,7 @@ docker exec kube-master ./automation/configure_sriovdp.sh
 # deploy sriov services
 kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/sriov-crd.yaml
 kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/sriovdp-daemonset.yaml
-kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/noop-cni-daemonset.yaml
+kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config apply -f cluster/k8s-1.13.0-sriov/manifests/sriov-cni-daemonset.yaml
 sleep 10
 
 # Make sure all containers are ready
@@ -113,5 +130,7 @@ kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config patch configmap kubevirt-co
 kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config get pods -n kubevirt | grep virt | awk '{print $1}' | xargs kubectl --kubeconfig cluster/k8s-1.13.0-sriov/config delete pods -n kubevirt
 
 wait_cluster_up
+
+false
 
 docker exec -t kube-master ./cluster/k8s-1.13.0-sriov/test.sh
