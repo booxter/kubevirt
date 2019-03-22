@@ -41,6 +41,25 @@ function _add_common_params() {
     echo $params
 }
 
+function prepare_client() {
+    platform=$1
+    if [ $platform = "openshift" ]; then
+	configfile=/etc/origin/master/admin.kubeconfig
+	client="oc --config"
+    else
+	configfile=/etc/kubernetes/admin.conf
+	client="kubectl --kubeconfig"
+    fi
+
+    # prepare kubectl config file
+    ${_cli} ssh --prefix $provider_prefix node01 -- sudo cp ${configfile} ~vagrant/
+    ${_cli} ssh --prefix $provider_prefix node01 -- sudo chown vagrant:vagrant ~vagrant/admin.kubeconfig
+
+    # create containerized wrapper
+    echo "test -t 1 && USE_TTY="-it"; ${KUBEVIRT_PATH}cluster/cli.sh ssh --prefix \$KUBEVIRT_PROVIDER node01 -- ${client} ~vagrant/admin.kubeconfig \$@" > ${KUBEVIRT_PATH}cluster/$KUBEVIRT_PROVIDER/.kubectl
+    chmod u+x ${KUBEVIRT_PATH}cluster/$KUBEVIRT_PROVIDER/.kubectl
+}
+
 function build() {
     # Build everyting and publish it
     ${KUBEVIRT_PATH}hack/dockerized "DOCKER_PREFIX=${DOCKER_PREFIX} DOCKER_TAG=${DOCKER_TAG} KUBEVIRT_PROVIDER=${KUBEVIRT_PROVIDER} IMAGE_PULL_POLICY=${IMAGE_PULL_POLICY} VERBOSITY=${VERBOSITY} ./hack/build-manifests.sh"

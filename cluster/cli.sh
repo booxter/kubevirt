@@ -2,7 +2,7 @@
 set -e
 
 source hack/common.sh
-test -t 1 && USE_TTY="-it"
+test -t 1 && USE_TTY="-it -a stdin"
 source ${KUBEVIRT_DIR}/cluster/$KUBEVIRT_PROVIDER/provider.sh
 source hack/config.sh
 
