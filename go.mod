@@ -3,6 +3,7 @@ module kubevirt.io/kubevirt
 require (
 	github.com/Azure/go-autorest/autorest v0.9.1 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
+	github.com/NYTimes/gziphandler v1.0.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-iptables v0.4.1
@@ -25,12 +26,12 @@ require (
 	github.com/go-openapi/spec v0.17.2
 	github.com/go-openapi/strfmt v0.18.0
 	github.com/go-openapi/validate v0.18.0
-	github.com/gogo/protobuf v1.2.1
+	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.1.1
 	github.com/golang/protobuf v1.3.1
 	github.com/google/goexpect v0.0.0-20190425035906-112704a48083
-	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf
+	github.com/google/gofuzz v1.0.0
 	github.com/google/goterm v0.0.0-20190311235235-ce302be1d114 // indirect
 	github.com/gophercloud/gophercloud v0.4.0 // indirect
 	github.com/gorilla/websocket v1.4.0
@@ -57,16 +58,16 @@ require (
 	github.com/vishvananda/netlink v0.0.0-20180206203732-d35d6b58e1cb
 	github.com/vishvananda/netns v0.0.0-20180720170159-13995c7128cc // indirect
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
-	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
+	golang.org/x/net v0.0.0-20190812203447-cdfb69ac37fc
 	golang.org/x/oauth2 v0.0.0-20181105165119-ca4130e427c7 // indirect
-	golang.org/x/sys v0.0.0-20190425145619-16072639606e
+	golang.org/x/sys v0.0.0-20190616124812-15dcb6c0061f
 	google.golang.org/grpc v1.19.1
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/ini.v1 v1.42.0
 	gopkg.in/yaml.v2 v2.2.2
 	k8s.io/api v0.0.0-20190313235455-40a48860b5ab
 	k8s.io/apiextensions-apiserver v0.0.0-20190315093550-53c4693659ed
-	k8s.io/apimachinery v0.0.0-20190313205120-d7deff9243b1
+	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
 	k8s.io/client-go v11.0.0+incompatible
 	k8s.io/kube-aggregator v0.0.0-20190228175259-3e0149950b0e
 	k8s.io/utils v0.0.0-20190607212802-c55fbcfc754a
@@ -74,7 +75,6 @@ require (
 	kubevirt.io/containerized-data-importer v1.10.1
 	kubevirt.io/qe-tools v0.1.3-0.20190512140058-934db0579e0c
 	sigs.k8s.io/controller-runtime v0.1.9 // indirect
-	sigs.k8s.io/yaml v1.1.0 // indirect
 )
 
 replace github.com/k8snetworkplumbingwg/network-attachment-definition-client => github.com/booxter/network-attachment-definition-client v0.0.0-20190912220442-7e1852337878
@@ -85,9 +85,9 @@ replace k8s.io/api => k8s.io/api v0.0.0-20190222213804-5cb15d344471
 
 replace k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
 
-replace k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
-
 replace github.com/go-kit/kit => github.com/go-kit/kit v0.3.0
+
+replace k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190831074630-461753078381
 
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v11.0.0+incompatible
 
