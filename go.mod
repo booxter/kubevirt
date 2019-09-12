@@ -1,12 +1,13 @@
 module kubevirt.io/kubevirt
 
 require (
+	github.com/Azure/go-autorest/autorest v0.9.1 // indirect
+	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-iptables v0.4.1
 	github.com/coreos/go-semver v0.2.0
 	github.com/coreos/prometheus-operator v0.31.1
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
 	github.com/elazarl/goproxy v0.0.0-20190421051319-9d40249d3c2f // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20190421051319-9d40249d3c2f // indirect
@@ -31,6 +32,7 @@ require (
 	github.com/google/goexpect v0.0.0-20190425035906-112704a48083
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf
 	github.com/google/goterm v0.0.0-20190311235235-ce302be1d114 // indirect
+	github.com/gophercloud/gophercloud v0.4.0 // indirect
 	github.com/gorilla/websocket v1.4.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
@@ -75,7 +77,7 @@ require (
 	sigs.k8s.io/yaml v1.1.0 // indirect
 )
 
-replace github.com/k8snetworkplumbingwg/network-attachment-definition-client => github.com/booxter/network-attachment-definition-client 7e18523378786183c19ddfe5d2a4e1f486dfe27d
+replace github.com/k8snetworkplumbingwg/network-attachment-definition-client => github.com/booxter/network-attachment-definition-client v0.0.0-20190912220442-7e1852337878
 
 replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
 
