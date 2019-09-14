@@ -4,7 +4,7 @@ require (
 	cloud.google.com/go v0.46.2 // indirect
 	github.com/Azure/go-autorest/autorest v0.9.1 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
-	github.com/NYTimes/gziphandler v1.0.1 // indirect
+	github.com/NYTimes/gziphandler v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-iptables v0.4.1
@@ -45,12 +45,14 @@ require (
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20181121151021-386d141f4c94
+	github.com/kr/pty v1.1.8 // indirect
 	github.com/krolaw/dhcp4 v0.0.0-20180925202202-7cead472c414
 	github.com/libvirt/libvirt-go v5.0.0+incompatible
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-runewidth v0.0.0-20181218000649-703b5e6b11ae // indirect
 	github.com/mitchellh/go-ps v0.0.0-20190716172923-621e5597135b
+	github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30 // indirect
 	github.com/onsi/ginkgo v1.10.1
 	github.com/onsi/gomega v1.7.0
 	github.com/openshift/api v3.9.1-0.20190401220125-3a6077f1f910+incompatible
@@ -60,6 +62,7 @@ require (
 	github.com/operator-framework/operator-marketplace v0.0.0-20190508022032-93d436f211c1
 	github.com/pborman/uuid v1.2.0
 	github.com/prometheus/client_golang v0.9.3
+	github.com/rogpeppe/go-charset v0.0.0-20190617161244-0dc95cdf6f31 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
@@ -69,7 +72,9 @@ require (
 	github.com/vishvananda/netns v0.0.0-20180720170159-13995c7128cc // indirect
 	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
 	golang.org/x/net v0.0.0-20190912160710-24e19bdeb0f2
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20190913121621-c3b328c6e5a7
+	golang.org/x/tools v0.0.0-20190913181337-0240832f5c3d // indirect
 	google.golang.org/appengine v1.6.2 // indirect
 	google.golang.org/grpc v1.23.1
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
@@ -80,19 +85,21 @@ require (
 	k8s.io/apiextensions-apiserver v0.0.0-20190315093550-53c4693659ed
 	k8s.io/apimachinery v0.0.0-20190913075813-344bcc0201c9
 	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/gengo v0.0.0-20190907103519-ebc107f98eab // indirect
 	k8s.io/kube-aggregator v0.0.0-20190228175259-3e0149950b0e
 	k8s.io/utils v0.0.0-20190907131718-3d4f5b7dea0b
 	kubevirt.io/client-go v0.0.0-00010101000000-000000000000
 	kubevirt.io/containerized-data-importer v1.10.1
 	kubevirt.io/qe-tools v0.1.3-0.20190512140058-934db0579e0c
 	sigs.k8s.io/controller-runtime v0.1.9 // indirect
+	sigs.k8s.io/structured-merge-diff v0.0.0-20190820212518-960c3cc04183 // indirect
 )
 
 replace github.com/k8snetworkplumbingwg/network-attachment-definition-client => github.com/booxter/network-attachment-definition-client v0.0.0-20190912220442-7e1852337878
 
 replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190913080825-6f3bc4ba9215
 
-replace k8s.io/api => k8s.io/api v0.0.0-20190222213804-5cb15d344471
+replace k8s.io/api => k8s.io/api v0.0.0-20190913080256-21721929cffa
 
 replace k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
 
