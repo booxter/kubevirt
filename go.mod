@@ -5,8 +5,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-iptables v0.4.1
 	github.com/coreos/go-semver v0.2.0
-	github.com/coreos/prometheus-operator v0.31.1
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/coreos/prometheus-operator v0.33.0
 	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
 	github.com/elazarl/goproxy v0.0.0-20190421051319-9d40249d3c2f // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20190421051319-9d40249d3c2f // indirect
@@ -32,7 +31,6 @@ require (
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf
 	github.com/google/goterm v0.0.0-20190311235235-ce302be1d114 // indirect
 	github.com/gorilla/websocket v1.4.0
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20181121151021-386d141f4c94
 	github.com/krolaw/dhcp4 v0.0.0-20180925202202-7cead472c414
@@ -56,7 +54,6 @@ require (
 	github.com/vishvananda/netns v0.0.0-20180720170159-13995c7128cc // indirect
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
-	golang.org/x/oauth2 v0.0.0-20181105165119-ca4130e427c7 // indirect
 	golang.org/x/sys v0.0.0-20190425145619-16072639606e
 	google.golang.org/grpc v1.19.1
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
@@ -93,4 +90,6 @@ replace github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-
 
 replace kubevirt.io/client-go => ./staging/src/kubevirt.io/client-go
 
-replace github.com/coreos/prometheus-operator => github.com/coreos/prometheus-operator v0.0.0-20181206002233-dd6f23e7207c
+replace github.com/coreos/prometheus-operator => github.com/coreos/prometheus-operator v0.0.0-20190202022740-dd6f23e7207c
+
+go 1.13
