@@ -3,7 +3,7 @@ module kubevirt.io/client-go
 go 1.12
 
 require (
-	github.com/coreos/prometheus-operator v0.31.1 // indirect
+	github.com/coreos/prometheus-operator v0.31.1
 	github.com/go-kit/kit v0.8.0
 	github.com/go-openapi/spec v0.17.2
 	github.com/go-openapi/swag v0.19.0 // indirect
@@ -21,7 +21,6 @@ require (
 	github.com/openshift/api v3.9.1-0.20190401220125-3a6077f1f910+incompatible // indirect
 	github.com/openshift/client-go v0.0.0-20190401163519-84c2b942258a
 	github.com/pborman/uuid v1.2.0
-	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/spf13/pflag v1.0.3
 	google.golang.org/appengine v1.5.0 // indirect
 	k8s.io/api v0.0.0-20190313235455-40a48860b5ab
@@ -33,14 +32,6 @@ require (
 )
 
 replace github.com/k8snetworkplumbingwg/network-attachment-definition-client => github.com/booxter/network-attachment-definition-client v0.0.0-20181121221720-d76adb95b0b7
-
-replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
-
-replace k8s.io/api => k8s.io/api v0.0.0-20190222213804-5cb15d344471
-
-replace k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
-
-replace k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
 
 replace github.com/go-kit/kit => github.com/go-kit/kit v0.3.0
 

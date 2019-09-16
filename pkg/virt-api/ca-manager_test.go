@@ -6,10 +6,10 @@ import (
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/util/cert"
 
 	"kubevirt.io/kubevirt/pkg/certificates/triple"
 	"kubevirt.io/kubevirt/pkg/util"
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 )
 
 var _ = Describe("CaManager", func() {
@@ -28,7 +28,7 @@ var _ = Describe("CaManager", func() {
 				ResourceVersion: "1",
 			},
 			Data: map[string]string{
-				util.RequestHeaderClientCAFileKey: string(cert.EncodeCertPEM(ca.Cert)),
+				util.RequestHeaderClientCAFileKey: string(pkiutil.EncodeCertPEM(ca.Cert)),
 			},
 		}
 		store = cache.NewStore(cache.DeletionHandlingMetaNamespaceKeyFunc)
@@ -45,7 +45,7 @@ var _ = Describe("CaManager", func() {
 	It("should detect updates on the informer and update the CA", func() {
 		newCA, err := triple.NewCA("new")
 		Expect(err).ToNot(HaveOccurred())
-		configMap.Data[util.RequestHeaderClientCAFileKey] = string(cert.EncodeCertPEM(newCA.Cert))
+		configMap.Data[util.RequestHeaderClientCAFileKey] = string(pkiutil.EncodeCertPEM(newCA.Cert))
 		configMap.ObjectMeta.ResourceVersion = "2"
 		cert, err := manager.GetCurrent()
 		Expect(err).ToNot(HaveOccurred())
@@ -62,7 +62,7 @@ var _ = Describe("CaManager", func() {
 		configMap.ObjectMeta.ResourceVersion = "3"
 		newCA, err := triple.NewCA("new")
 		Expect(err).ToNot(HaveOccurred())
-		configMap.Data[util.RequestHeaderClientCAFileKey] = string(cert.EncodeCertPEM(newCA.Cert))
+		configMap.Data[util.RequestHeaderClientCAFileKey] = string(pkiutil.EncodeCertPEM(newCA.Cert))
 		cert, err := manager.GetCurrent()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(cert.Subjects()[0]).To(ContainSubstring("new"))

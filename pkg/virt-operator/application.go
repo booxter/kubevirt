@@ -243,6 +243,7 @@ func (app *VirtOperatorApp) Run() {
 		app.operatorNamespace,
 		endpointName,
 		app.clientSet.CoreV1(),
+		app.clientSet.CoordinationV1(),
 		resourcelock.ResourceLockConfig{
 			Identity:      id,
 			EventRecorder: recorder,

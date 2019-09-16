@@ -1,10 +1,10 @@
 package certificates
 
 import (
-	"k8s.io/client-go/util/cert"
 	"k8s.io/client-go/util/certificate"
 
 	"kubevirt.io/kubevirt/pkg/certificates/triple"
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 )
 
 func GenerateSelfSignedCert(certsDirectory string, name string, namespace string) (certificate.FileStore, error) {
@@ -23,7 +23,7 @@ func GenerateSelfSignedCert(certsDirectory string, name string, namespace string
 	if err != nil {
 		return nil, err
 	}
-	_, err = store.Update(cert.EncodeCertPEM(keyPair.Cert), cert.EncodePrivateKeyPEM(keyPair.Key))
+	_, err = store.Update(pkiutil.EncodeCertPEM(keyPair.Cert), pkiutil.EncodePrivateKeyPEM(keyPair.Key))
 	if err != nil {
 		return nil, err
 	}

@@ -35,7 +35,6 @@ import (
 	extv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/util/cert"
 
 	"github.com/blang/semver"
 
@@ -44,6 +43,7 @@ import (
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/certificates/triple"
 	"kubevirt.io/kubevirt/pkg/controller"
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 	"kubevirt.io/kubevirt/pkg/virt-operator/creation/components"
 	"kubevirt.io/kubevirt/pkg/virt-operator/creation/rbac"
 	"kubevirt.io/kubevirt/pkg/virt-operator/util"
@@ -403,7 +403,7 @@ func createDummyWebhookValidator(targetStrategy *InstallStrategy,
 	// Set some fake signing cert bytes in for each rule so the k8s apiserver will
 	// allow us to create the webhook.
 	caKeyPair, _ := triple.NewCA("fake.kubevirt.io")
-	signingCertBytes := cert.EncodeCertPEM(caKeyPair.Cert)
+	signingCertBytes := pkiutil.EncodeCertPEM(caKeyPair.Cert)
 	for _, webhook := range webhooks {
 		webhook.ClientConfig.CABundle = signingCertBytes
 	}

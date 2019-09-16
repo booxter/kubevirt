@@ -60,6 +60,7 @@ import (
 	_ "kubevirt.io/kubevirt/pkg/monitoring/workqueue/prometheus" // import for prometheus metrics
 	"kubevirt.io/kubevirt/pkg/service"
 	"kubevirt.io/kubevirt/pkg/util"
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
 	virthandler "kubevirt.io/kubevirt/pkg/virt-handler"
 	virtcache "kubevirt.io/kubevirt/pkg/virt-handler/cache"
@@ -139,9 +140,9 @@ func (app *virtHandlerApp) getSelfSignedCert() error {
 		},
 		Type: "Opaque",
 		Data: map[string][]byte{
-			clientCertBytesValue:  cert.EncodeCertPEM(clientKeyPair.Cert),
-			clientKeyBytesValue:   cert.EncodePrivateKeyPEM(clientKeyPair.Key),
-			signingCertBytesValue: cert.EncodeCertPEM(caKeyPair.Cert),
+			clientCertBytesValue:  pkiutil.EncodeCertPEM(clientKeyPair.Cert),
+			clientKeyBytesValue:   pkiutil.EncodePrivateKeyPEM(clientKeyPair.Key),
+			signingCertBytesValue: pkiutil.EncodeCertPEM(caKeyPair.Cert),
 		},
 	}
 	_, err := app.virtCli.CoreV1().Secrets(app.namespace).Create(secret)

@@ -36,11 +36,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/cert"
 	aggregatorclient "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"kubevirt.io/kubevirt/pkg/certificates/triple"
 	"kubevirt.io/kubevirt/pkg/util"
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 
 	v1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
@@ -141,9 +141,9 @@ var _ = Describe("Virt-api", func() {
 				nil,
 				nil,
 			)
-			keyBytes := cert.EncodePrivateKeyPEM(keyPair.Key)
-			certBytes := cert.EncodeCertPEM(keyPair.Cert)
-			signingCertBytes := cert.EncodeCertPEM(caKeyPair.Cert)
+			keyBytes := pkiutil.EncodePrivateKeyPEM(keyPair.Key)
+			certBytes := pkiutil.EncodeCertPEM(keyPair.Cert)
+			signingCertBytes := pkiutil.EncodeCertPEM(caKeyPair.Cert)
 			secret := k8sv1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      virtApiCertSecretName,
@@ -209,8 +209,8 @@ var _ = Describe("Virt-api", func() {
 		It("should create a tls config which uses the CA Manager", func() {
 			ca, err := triple.NewCA("first")
 			// Just provide any cert
-			app.certBytes = cert.EncodeCertPEM(ca.Cert)
-			app.keyBytes = cert.EncodePrivateKeyPEM(ca.Key)
+			app.certBytes = pkiutil.EncodeCertPEM(ca.Cert)
+			app.keyBytes = pkiutil.EncodePrivateKeyPEM(ca.Key)
 			Expect(err).ToNot(HaveOccurred())
 			configMap := &k8sv1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
@@ -219,7 +219,7 @@ var _ = Describe("Virt-api", func() {
 					ResourceVersion: "1",
 				},
 				Data: map[string]string{
-					util.RequestHeaderClientCAFileKey: string(cert.EncodeCertPEM(ca.Cert)),
+					util.RequestHeaderClientCAFileKey: string(pkiutil.EncodeCertPEM(ca.Cert)),
 				},
 			}
 			store := cache.NewStore(cache.DeletionHandlingMetaNamespaceKeyFunc)
@@ -235,7 +235,7 @@ var _ = Describe("Virt-api", func() {
 			By("checking if the new certificate is used in the tlsConfig")
 			newCA, err := triple.NewCA("new")
 			Expect(err).ToNot(HaveOccurred())
-			configMap.Data[util.RequestHeaderClientCAFileKey] = string(cert.EncodeCertPEM(newCA.Cert))
+			configMap.Data[util.RequestHeaderClientCAFileKey] = string(pkiutil.EncodeCertPEM(newCA.Cert))
 			configMap.ObjectMeta.ResourceVersion = "2"
 			config, err = app.tlsConfig.GetConfigForClient(nil)
 			Expect(err).ToNot(HaveOccurred())

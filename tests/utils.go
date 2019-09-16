@@ -3380,7 +3380,7 @@ func NewHelloWorldJobHttp(host string, port string) *k8sv1.Pod {
 }
 
 func GetNodeWithHugepages(virtClient kubecli.KubevirtClient, hugepages k8sv1.ResourceName) *k8sv1.Node {
-	nodes, err := virtClient.Core().Nodes().List(metav1.ListOptions{})
+	nodes, err := virtClient.CoreV1().Nodes().List(metav1.ListOptions{})
 	ExpectWithOffset(1, err).ToNot(HaveOccurred())
 
 	for _, node := range nodes.Items {

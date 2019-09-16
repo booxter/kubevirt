@@ -6,6 +6,7 @@ import (
 	fuzz "github.com/google/gofuzz"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var _ = Describe("Generated deepcopy functions", func() {
@@ -89,7 +90,12 @@ var _ = Describe("Generated deepcopy functions", func() {
 
 	It("should work for fuzzed structs", func() {
 		for _, s := range structs {
-			fuzz.New().NilChance(0).Fuzz(s)
+			fuzz.New().NilChance(0).Funcs(
+				// since Fields are a recursive data structure, terminate it with an empty value
+				func(f *metav1.Fields, c fuzz.Continue) {
+					*f = metav1.Fields{}
+				},
+			).Fuzz(s)
 			Expect(reflect.ValueOf(s).MethodByName("DeepCopy").Call(nil)[0].Interface()).To(Equal(s))
 			if reflect.ValueOf(s).MethodByName("DeepCopyObject").IsValid() {
 				Expect(reflect.ValueOf(s).MethodByName("DeepCopyObject").Call(nil)[0].Interface()).To(Equal(s))
@@ -98,6 +104,5 @@ var _ = Describe("Generated deepcopy functions", func() {
 			reflect.ValueOf(s).MethodByName("DeepCopyInto").Call([]reflect.Value{new})
 			Expect(new.Interface()).To(Equal(s))
 		}
-
 	})
 })

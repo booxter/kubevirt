@@ -39,7 +39,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/util/cert"
 	apiregistrationv1beta1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1"
 	aggregatorclient "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
@@ -55,6 +54,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/service"
 	"kubevirt.io/kubevirt/pkg/util"
 	"kubevirt.io/kubevirt/pkg/util/openapi"
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 	"kubevirt.io/kubevirt/pkg/virt-api/rest"
 	"kubevirt.io/kubevirt/pkg/virt-api/webhooks"
 	mutating_webhook "kubevirt.io/kubevirt/pkg/virt-api/webhooks/mutating-webhook"
@@ -499,9 +499,9 @@ func (app *virtAPIApp) getSelfSignedCert() error {
 		},
 		Type: "Opaque",
 		Data: map[string][]byte{
-			certBytesValue:        cert.EncodeCertPEM(keyPair.Cert),
-			keyBytesValue:         cert.EncodePrivateKeyPEM(keyPair.Key),
-			signingCertBytesValue: cert.EncodeCertPEM(caKeyPair.Cert),
+			certBytesValue:        pkiutil.EncodeCertPEM(keyPair.Cert),
+			keyBytesValue:         pkiutil.EncodePrivateKeyPEM(keyPair.Key),
+			signingCertBytesValue: pkiutil.EncodeCertPEM(caKeyPair.Cert),
 		},
 	}
 	_, err := app.virtCli.CoreV1().Secrets(app.namespace).Create(secret)

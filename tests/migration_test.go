@@ -39,13 +39,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/rand"
-	"k8s.io/client-go/util/cert"
 
 	v1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
 	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
 	"kubevirt.io/kubevirt/pkg/certificates/triple"
 	migrations "kubevirt.io/kubevirt/pkg/util/migrations"
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 	"kubevirt.io/kubevirt/tests"
 )
 
@@ -885,8 +885,8 @@ var _ = Describe("[rfe_id:393][crit:high[vendor:cnv-qe@redhat.com][level:system]
 					nil,
 				)
 
-				certPEM := cert.EncodeCertPEM(clientKeyPair.Cert)
-				keyPEM := cert.EncodePrivateKeyPEM(clientKeyPair.Key)
+				certPEM := pkiutil.EncodeCertPEM(clientKeyPair.Cert)
+				keyPEM := pkiutil.EncodePrivateKeyPEM(clientKeyPair.Key)
 				cert, err := tls.X509KeyPair(certPEM, keyPEM)
 				Expect(err).ToNot(HaveOccurred())
 				tlsConfig := &tls.Config{

@@ -1,6 +1,8 @@
 module kubevirt.io/kubevirt
 
 require (
+	github.com/Azure/go-autorest/autorest v0.9.1 // indirect
+	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-iptables v0.4.1
@@ -12,6 +14,7 @@ require (
 	github.com/emicklei/go-restful v2.8.1+incompatible
 	github.com/emicklei/go-restful-openapi v0.10.0
 	github.com/evanphx/json-patch v4.2.0+incompatible
+	github.com/fatih/color v1.7.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/ghodss/yaml v1.0.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
@@ -30,6 +33,7 @@ require (
 	github.com/google/goexpect v0.0.0-20190425035906-112704a48083
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf
 	github.com/google/goterm v0.0.0-20190311235235-ce302be1d114 // indirect
+	github.com/gophercloud/gophercloud v0.4.0 // indirect
 	github.com/gorilla/websocket v1.4.0
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20181121151021-386d141f4c94
@@ -47,6 +51,7 @@ require (
 	github.com/operator-framework/operator-marketplace v0.0.0-20190508022032-93d436f211c1
 	github.com/pborman/uuid v1.2.0
 	github.com/prometheus/client_golang v0.9.3
+	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
 	github.com/subgraph/libmacouflage v0.0.1
@@ -54,6 +59,7 @@ require (
 	github.com/vishvananda/netns v0.0.0-20180720170159-13995c7128cc // indirect
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
+	golang.org/x/oauth2 v0.0.0-20181105165119-ca4130e427c7 // indirect
 	golang.org/x/sys v0.0.0-20190425145619-16072639606e
 	google.golang.org/grpc v1.19.1
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
@@ -74,15 +80,15 @@ require (
 
 replace github.com/k8snetworkplumbingwg/network-attachment-definition-client => github.com/booxter/network-attachment-definition-client v0.0.0-20181121221720-d76adb95b0b7
 
-replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
-
-replace k8s.io/api => k8s.io/api v0.0.0-20190222213804-5cb15d344471
-
-replace k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
-
-replace k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
-
 replace github.com/go-kit/kit => github.com/go-kit/kit v0.3.0
+
+replace k8s.io/client-go => k8s.io/client-go v11.0.0+incompatible
+
+replace k8s.io/api => k8s.io/api v0.0.0-20190313235455-40a48860b5ab
+
+replace k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190315093550-53c4693659ed
+
+replace k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190313205120-d7deff9243b1
 
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v11.0.0+incompatible
 

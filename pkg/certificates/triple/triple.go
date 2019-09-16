@@ -22,6 +22,8 @@ import (
 	"net"
 
 	certutil "k8s.io/client-go/util/cert"
+
+	"kubevirt.io/kubevirt/pkg/util/pkiutil"
 )
 
 type KeyPair struct {
@@ -30,7 +32,7 @@ type KeyPair struct {
 }
 
 func NewCA(name string) (*KeyPair, error) {
-	key, err := certutil.NewPrivateKey()
+	key, err := pkiutil.NewPrivateKey()
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a private key for a new CA: %v", err)
 	}
@@ -51,7 +53,7 @@ func NewCA(name string) (*KeyPair, error) {
 }
 
 func NewServerKeyPair(ca *KeyPair, commonName, svcName, svcNamespace, dnsDomain string, ips, hostnames []string) (*KeyPair, error) {
-	key, err := certutil.NewPrivateKey()
+	key, err := pkiutil.NewPrivateKey()
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a server private key: %v", err)
 	}
@@ -79,7 +81,7 @@ func NewServerKeyPair(ca *KeyPair, commonName, svcName, svcNamespace, dnsDomain 
 		AltNames:   altNames,
 		Usages:     []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 	}
-	cert, err := certutil.NewSignedCert(config, key, ca.Cert, ca.Key)
+	cert, err := pkiutil.NewSignedCert(&config, key, ca.Cert, ca.Key)
 	if err != nil {
 		return nil, fmt.Errorf("unable to sign the server certificate: %v", err)
 	}
@@ -91,7 +93,7 @@ func NewServerKeyPair(ca *KeyPair, commonName, svcName, svcNamespace, dnsDomain 
 }
 
 func NewClientKeyPair(ca *KeyPair, commonName string, organizations []string) (*KeyPair, error) {
-	key, err := certutil.NewPrivateKey()
+	key, err := pkiutil.NewPrivateKey()
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a client private key: %v", err)
 	}
@@ -101,7 +103,7 @@ func NewClientKeyPair(ca *KeyPair, commonName string, organizations []string) (*
 		Organization: organizations,
 		Usages:       []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 	}
-	cert, err := certutil.NewSignedCert(config, key, ca.Cert, ca.Key)
+	cert, err := pkiutil.NewSignedCert(&config, key, ca.Cert, ca.Key)
 	if err != nil {
 		return nil, fmt.Errorf("unable to sign the client certificate: %v", err)
 	}
