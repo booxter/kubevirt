@@ -347,12 +347,11 @@ func (t *templateService) RenderLaunchManifest(vmi *v1.VirtualMachineInstance) (
 	})
 
 	if util.IsSRIOVVmi(vmi) || util.IsGPUVMI(vmi) {
-		// libvirt needs this volume to access PCI device config;
-		// note that the volume should not be read-only because libvirt
-		// opens the config for writing
+		// libvirt needs this volume to access PCI device config
 		volumeMounts = append(volumeMounts, k8sv1.VolumeMount{
 			Name:      "pci-devices",
 			MountPath: "/sys/devices/",
+			ReadOnly:  true,
 		})
 		volumes = append(volumes, k8sv1.Volume{
 			Name: "pci-devices",
