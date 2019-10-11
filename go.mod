@@ -6,6 +6,7 @@ require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/blang/semver v3.5.1+incompatible
+	github.com/containernetworking/plugins v0.8.2
 	github.com/coreos/go-iptables v0.4.3
 	github.com/coreos/go-semver v0.3.0
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
@@ -57,8 +58,7 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
 	github.com/subgraph/libmacouflage v0.0.1
-	github.com/vishvananda/netlink v0.0.0-20180206203732-d35d6b58e1cb
-	github.com/vishvananda/netns v0.0.0-20180720170159-13995c7128cc // indirect
+	github.com/vishvananda/netlink v0.0.0-20181108222139-023a6dafdcdf
 	golang.org/x/crypto v0.0.0-20190611184440-5c40567a22f8
 	golang.org/x/net v0.0.0-20190613194153-d28f0bde5980
 	golang.org/x/oauth2 v0.0.0-20181105165119-ca4130e427c7 // indirect

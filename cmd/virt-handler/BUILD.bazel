@@ -61,7 +61,7 @@ load(
 
 container_image(
     name = "version-container",
-    base = "@fedora//image",
+    base = "@libvirt//image",
     directory = "/",
     files = [
         ":base_container.cil",
