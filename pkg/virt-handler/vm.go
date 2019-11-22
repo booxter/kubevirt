@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"reflect"
 	"strings"
 	"sync"
@@ -74,6 +75,7 @@ func NewController(
 	host string,
 	ipAddress string,
 	virtShareDir string,
+	virtNetworkDir string,
 	vmiSourceInformer cache.SharedIndexInformer,
 	vmiTargetInformer cache.SharedIndexInformer,
 	domainInformer cache.SharedInformer,
@@ -94,6 +96,7 @@ func NewController(
 		host:                     host,
 		ipAddress:                ipAddress,
 		virtShareDir:             virtShareDir,
+		virtNetworkDir:           virtNetworkDir,
 		vmiSourceInformer:        vmiSourceInformer,
 		vmiTargetInformer:        vmiTargetInformer,
 		domainInformer:           domainInformer,
@@ -143,6 +146,7 @@ type VirtualMachineController struct {
 	host                     string
 	ipAddress                string
 	virtShareDir             string
+	virtNetworkDir           string
 	Queue                    workqueue.RateLimitingInterface
 	vmiSourceInformer        cache.SharedIndexInformer
 	vmiTargetInformer        cache.SharedIndexInformer
@@ -801,6 +805,14 @@ func (d *VirtualMachineController) defaultExecute(key string,
 		log.Log.Object(domain).Infof("Domain status: %v, reason: %v\n", domain.Status.Status, domain.Status.Reason)
 	} else {
 		log.Log.Info("Domain does not exist")
+	}
+
+	// make sure the per-vmi shared directory exists
+	interfaceCacheFile := "/var/run/kubevirt-network/%s/interface-cache-%s.json" // todo
+	dir := fmt.Sprintf(path.Dir(interfaceCacheFile), string(vmi.UID))
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+	        return fmt.Errorf("failed to create directory to share cached files: %v", err)
 	}
 
 	domainAlive := domainExists &&
