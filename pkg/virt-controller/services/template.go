@@ -347,7 +347,7 @@ func (t *templateService) RenderLaunchManifest(vmi *v1.VirtualMachineInstance) (
 		Name:             "virt-network-dir",
 		MountPath:        path.Join(t.virtNetworkDir, string(vmi.UID)),
 		MountPropagation: &prop,
-		ReadOnly:  true,
+		ReadOnly:         true,
 	})
 
 	volumeMounts = append(volumeMounts, k8sv1.VolumeMount{

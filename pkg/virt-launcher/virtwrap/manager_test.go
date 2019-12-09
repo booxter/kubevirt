@@ -94,7 +94,7 @@ var _ = Describe("Manager", func() {
 	}
 
 	Context("on successful VirtualMachineInstance sync", func() {
-		It("should define and start a new VirtualMachineInstance", func() {
+		It("should define a new VirtualMachineInstance", func() {
 			// Make sure that we always free the domain after use
 			mockDomain.EXPECT().Free()
 			StubOutNetworkForTest()
@@ -107,14 +107,13 @@ var _ = Describe("Manager", func() {
 			Expect(err).To(BeNil())
 			mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
 			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_SHUTDOWN, 1, nil)
-			mockDomain.EXPECT().Create().Return(nil)
 			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
 			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0)
 			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
 			Expect(err).To(BeNil())
 			Expect(newspec).ToNot(BeNil())
 		})
-		It("should define and start a new VirtualMachineInstance with userData", func() {
+		It("should define a new VirtualMachineInstance with userData", func() {
 			// Make sure that we always free the domain after use
 			mockDomain.EXPECT().Free()
 			StubOutNetworkForTest()
@@ -129,14 +128,13 @@ var _ = Describe("Manager", func() {
 			Expect(err).To(BeNil())
 			mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
 			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_SHUTDOWN, 1, nil)
-			mockDomain.EXPECT().Create().Return(nil)
 			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
 			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0)
 			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
 			Expect(err).To(BeNil())
 			Expect(newspec).ToNot(BeNil())
 		})
-		It("should define and start a new VirtualMachineInstance with userData and networkData", func() {
+		It("should define a new VirtualMachineInstance with userData and networkData", func() {
 			// Make sure that we always free the domain after use
 			mockDomain.EXPECT().Free()
 			StubOutNetworkForTest()
@@ -150,14 +148,13 @@ var _ = Describe("Manager", func() {
 			Expect(err).To(BeNil())
 			mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
 			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_SHUTDOWN, 1, nil)
-			mockDomain.EXPECT().Create().Return(nil)
 			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
 			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0)
 			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
 			Expect(err).To(BeNil())
 			Expect(newspec).ToNot(BeNil())
 		})
-		It("should leave a defined and started VirtualMachineInstance alone", func() {
+		It("should leave a defined VirtualMachineInstance alone", func() {
 			// Make sure that we always free the domain after use
 			mockDomain.EXPECT().Free()
 			vmi := newVMI(testNamespace, testVmName)
@@ -172,7 +169,7 @@ var _ = Describe("Manager", func() {
 			Expect(err).To(BeNil())
 			Expect(newspec).ToNot(BeNil())
 		})
-		table.DescribeTable("should try to start a VirtualMachineInstance in state",
+		table.DescribeTable("should not try to start a VirtualMachineInstance in state",
 			func(state libvirt.DomainState) {
 				// Make sure that we always free the domain after use
 				mockDomain.EXPECT().Free()
@@ -183,7 +180,6 @@ var _ = Describe("Manager", func() {
 				mockConn.EXPECT().LookupDomainByName(testDomainName).Return(mockDomain, nil)
 				mockDomain.EXPECT().GetState().Return(state, 1, nil)
 				mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
-				mockDomain.EXPECT().Create().Return(nil)
 				mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
 				manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0)
 				newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
@@ -195,7 +191,7 @@ var _ = Describe("Manager", func() {
 			table.Entry("shutoff", libvirt.DOMAIN_SHUTOFF),
 			table.Entry("unknown", libvirt.DOMAIN_NOSTATE),
 		)
-		It("should unpause a paused VirtualMachineInstance on SyncVMI, which was not paused by user", func() {
+		It("should not unpause a paused VirtualMachineInstance on SyncVMI, which was not paused by user", func() {
 			// Make sure that we always free the domain after use
 			mockDomain.EXPECT().Free()
 			vmi := newVMI(testNamespace, testVmName)
@@ -204,7 +200,6 @@ var _ = Describe("Manager", func() {
 
 			mockConn.EXPECT().LookupDomainByName(testDomainName).Return(mockDomain, nil)
 			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_PAUSED, 1, nil)
-			mockDomain.EXPECT().Resume().Return(nil)
 			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
 			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0)
 			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})

@@ -48,7 +48,6 @@ import (
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	cloudinit "kubevirt.io/kubevirt/pkg/cloud-init"
-	containerdisk "kubevirt.io/kubevirt/pkg/container-disk"
 	"kubevirt.io/kubevirt/pkg/controller"
 	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 	hostdisk "kubevirt.io/kubevirt/pkg/host-disk"
@@ -1394,56 +1393,6 @@ func (d *VirtualMachineController) handleMigrationProxy(vmi *v1.VirtualMachineIn
 	return nil
 }
 
-// This function does just enough to get a domain object that would allow
-// phase1 network configuration to succeed. This object is not complete and may
-// miss some important data useful in a different context. Be cautious before
-// using the result of this function in a different context. Consider using
-// domainInformer instead as available.
-func getDomain(vmi *v1.VirtualMachineInstance) (*api.Domain, error) {
-	isBlockPVCMap := make(map[string]bool)
-	isBlockDVMap := make(map[string]bool)
-	diskInfo := make(map[string]*containerdisk.DiskInfo)
-	for _, volume := range vmi.Spec.Volumes {
-		if volume.VolumeSource.PersistentVolumeClaim != nil {
-			isBlockPVCMap[volume.Name] = true
-		} else if volume.VolumeSource.ContainerDisk != nil {
-			diskInfo[volume.Name] = &containerdisk.DiskInfo{}
-		} else if volume.VolumeSource.DataVolume != nil {
-			isBlockDVMap[volume.Name] = true
-		}
-	}
-
-	c := &api.ConverterContext{
-		VirtualMachine: vmi,
-		DiskType:       diskInfo,
-		IsBlockPVC:     isBlockPVCMap,
-		IsBlockDV:      isBlockDVMap,
-		// virt-handler may not have kvm initialized
-		UseEmulation: true,
-		// skip non-essential initialization that requires full
-		// virt-launcher execution context (envvars etc.)
-		BestEffort: true,
-	}
-	domain := &api.Domain{}
-	if err := api.Convert_v1_VirtualMachine_To_api_Domain(vmi, domain, c); err != nil {
-		return nil, err
-	}
-	return domain, nil
-}
-
-func setupNetworkPhase1(vmi *v1.VirtualMachineInstance) error {
-	// domainInformer doesn't have the domain cached just yet, so we have
-	// to reconstruct the object here
-	domain, err := getDomain(vmi)
-	if err != nil {
-		return err
-	}
-	if err = network.SetupPodNetworkPhase1(vmi, domain); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (d *VirtualMachineController) processVmUpdate(origVMI *v1.VirtualMachineInstance) error {
 	vmi := origVMI.DeepCopy()
 
@@ -1531,12 +1480,6 @@ func (d *VirtualMachineController) processVmUpdate(origVMI *v1.VirtualMachineIns
 			return fmt.Errorf("failed to detect isolation for launcher pod: %v", err)
 		}
 
-		if err := res.DoNetNS(func() error {
-			return setupNetworkPhase1(vmi)
-		}); err != nil {
-			return fmt.Errorf("failed to configure vmi network: %v", err)
-		}
-
 		err = d.podIsolationDetector.AdjustResources(vmi)
 		if err != nil {
 			return fmt.Errorf("failed to adjust resources: %v", err)
@@ -1553,6 +1496,26 @@ func (d *VirtualMachineController) processVmUpdate(origVMI *v1.VirtualMachineIns
 		}
 
 		err = client.SyncVirtualMachine(vmi, options)
+		if err != nil {
+			return err
+		}
+
+		domain, domainExists, err := d.getDomainFromCache(controller.VirtualMachineKey(vmi))
+		if err != nil {
+			return err
+		}
+		log.Log.Object(vmi).Infof("Waiting for %s domain", vmi.GetObjectMeta().GetName())
+		if !domainExists {
+			return fmt.Errorf("failed to retrieve domain from cache: %v", err)
+		}
+
+		if err := res.DoNetNS(func() error {
+			return network.SetupPodNetworkPhase1(vmi, domain)
+		}); err != nil {
+			return fmt.Errorf("failed to configure vmi network: %v", err)
+		}
+
+		err = client.StartVirtualMachine(vmi, options)
 		if err != nil {
 			return err
 		}

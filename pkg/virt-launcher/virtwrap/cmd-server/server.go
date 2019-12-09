@@ -168,6 +168,24 @@ func (l *Launcher) SyncVirtualMachine(ctx context.Context, request *cmdv1.VMIReq
 	return response, nil
 }
 
+func (l *Launcher) StartVirtualMachine(ctx context.Context, request *cmdv1.VMIRequest) (*cmdv1.Response, error) {
+
+	vmi, response := getVMIFromRequest(request.Vmi)
+	if !response.Success {
+		return response, nil
+	}
+
+	if _, err := l.domainManager.StartVMI(vmi, l.useEmulation, request.Options); err != nil {
+		log.Log.Object(vmi).Reason(err).Errorf("Failed to start vmi")
+		response.Success = false
+		response.Message = getErrorMessage(err)
+		return response, nil
+	}
+
+	log.Log.Object(vmi).Info("Started vmi")
+	return response, nil
+}
+
 func (l *Launcher) PauseVirtualMachine(ctx context.Context, request *cmdv1.VMIRequest) (*cmdv1.Response, error) {
 	vmi, response := getVMIFromRequest(request.Vmi)
 	if !response.Success {

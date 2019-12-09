@@ -43,6 +43,16 @@ func (_mr *_MockLauncherClientRecorder) SyncVirtualMachine(arg0, arg1 interface{
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "SyncVirtualMachine", arg0, arg1)
 }
 
+func (_m *MockLauncherClient) StartVirtualMachine(vmi *v1.VirtualMachineInstance, options *v10.VirtualMachineOptions) error {
+	ret := _m.ctrl.Call(_m, "StartVirtualMachine", vmi, options)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockLauncherClientRecorder) StartVirtualMachine(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "StartVirtualMachine", arg0, arg1)
+}
+
 func (_m *MockLauncherClient) PauseVirtualMachine(vmi *v1.VirtualMachineInstance) error {
 	ret := _m.ctrl.Call(_m, "PauseVirtualMachine", vmi)
 	ret0, _ := ret[0].(error)

@@ -305,7 +305,7 @@ var _ = Describe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 			table.Entry("[test_id:1546]on a different node from Node", v12.NodeSelectorOpNotIn, true),
 		)
 
-		Context("with a service matching the vmi exposed", func() {
+		FContext("with a service matching the vmi exposed", func() {
 			BeforeEach(func() {
 				service := &v12.Service{
 					ObjectMeta: v13.ObjectMeta{

@@ -72,6 +72,7 @@ const vgpuEnvPrefix = "VGPU_PASSTHROUGH_DEVICES"
 
 type DomainManager interface {
 	SyncVMI(*v1.VirtualMachineInstance, bool, *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error)
+	StartVMI(*v1.VirtualMachineInstance, bool, *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error)
 	PauseVMI(*v1.VirtualMachineInstance) error
 	UnpauseVMI(*v1.VirtualMachineInstance) error
 	KillVMI(*v1.VirtualMachineInstance) error
@@ -802,11 +803,6 @@ func (l *LibvirtDomainManager) preStartHook(vmi *v1.VirtualMachineInstance, doma
 		}
 	}
 
-	err = network.SetupNetworkInterfacesPhase2(vmi, domain)
-	if err != nil {
-		return domain, fmt.Errorf("preparing the pod network failed: %v", err)
-	}
-
 	// create disks images on the cluster lever
 	// or initalize disks images for empty PVC
 	hostDiskCreator := hostdisk.NewHostDiskCreator(l.notifier, l.lessPVCSpaceToleration)
@@ -943,6 +939,7 @@ func parseDeviceAddress(addrString string) []string {
 	}
 	return addrs
 }
+
 func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulation bool, options *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error) {
 	l.domainModifyLock.Lock()
 	defer l.domainModifyLock.Unlock()
@@ -1053,6 +1050,125 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulat
 	// To make sure, that we set the right qemu wrapper arguments,
 	// we update the domain XML whenever a VirtualMachineInstance was already defined but not running
 	if !newDomain && cli.IsDown(domState) {
+		dom, err = l.setDomainSpecWithHooks(vmi, &domain.Spec)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	xmlstr, err := dom.GetXMLDesc(0)
+	if err != nil {
+		return nil, err
+	}
+
+	var newSpec api.DomainSpec
+	err = xml.Unmarshal([]byte(xmlstr), &newSpec)
+	if err != nil {
+		logger.Reason(err).Error("Parsing domain XML failed.")
+		return nil, err
+	}
+
+	// TODO: check if VirtualMachineInstance Spec and Domain Spec are equal or if we have to sync
+	return &newSpec, nil
+}
+
+func (l *LibvirtDomainManager) StartVMI(vmi *v1.VirtualMachineInstance, useEmulation bool, options *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error) {
+	l.domainModifyLock.Lock()
+	defer l.domainModifyLock.Unlock()
+
+	logger := log.Log.Object(vmi)
+
+	domain := &api.Domain{}
+	var emulatorThreadCpu *int
+	podCPUSet, err := util.GetPodCPUSet()
+	if err != nil {
+		logger.Reason(err).Error("failed to read pod cpuset.")
+		return nil, err
+	}
+	// reserve the last cpu for the emulator thread
+	if vmi.IsCPUDedicated() && vmi.Spec.Domain.CPU.IsolateEmulatorThread {
+		if len(podCPUSet) > 0 {
+			emulatorThreadCpu = &podCPUSet[len(podCPUSet)-1]
+			podCPUSet = podCPUSet[:len(podCPUSet)-1]
+		}
+	}
+
+	// Check if PVC volumes are block volumes
+	isBlockPVCMap := make(map[string]bool)
+	isBlockDVMap := make(map[string]bool)
+	diskInfo := make(map[string]*containerdisk.DiskInfo)
+	for i, volume := range vmi.Spec.Volumes {
+		if volume.VolumeSource.PersistentVolumeClaim != nil {
+			isBlockPVC, err := isBlockDeviceVolume(volume.Name)
+			if err != nil {
+				logger.Reason(err).Errorf("failed to detect volume mode for Volume %v and PVC %v.",
+					volume.Name, volume.VolumeSource.PersistentVolumeClaim.ClaimName)
+				return nil, err
+			}
+			isBlockPVCMap[volume.Name] = isBlockPVC
+		} else if volume.VolumeSource.ContainerDisk != nil {
+			image, err := containerdisk.GetDiskTargetPartFromLauncherView(i)
+			if err != nil {
+				return nil, err
+			}
+			info, err := GetImageInfo(image)
+			if err != nil {
+				return nil, err
+			}
+			diskInfo[volume.Name] = info
+		} else if volume.VolumeSource.DataVolume != nil {
+			isBlockDV, err := isBlockDeviceVolume(volume.Name)
+			if err != nil {
+				logger.Reason(err).Errorf("failed to detect volume mode for Volume %v and DV %v.",
+					volume.Name, volume.VolumeSource.DataVolume.Name)
+				return nil, err
+			}
+			isBlockDVMap[volume.Name] = isBlockDV
+		}
+	}
+
+	// Map the VirtualMachineInstance to the Domain
+	c := &api.ConverterContext{
+		VirtualMachine:    vmi,
+		UseEmulation:      useEmulation,
+		CPUSet:            podCPUSet,
+		IsBlockPVC:        isBlockPVCMap,
+		IsBlockDV:         isBlockDVMap,
+		DiskType:          diskInfo,
+		SRIOVDevices:      getSRIOVPCIAddresses(vmi.Spec.Domain.Devices.Interfaces),
+		GpuDevices:        getEnvAddressListByPrefix(gpuEnvPrefix),
+		VgpuDevices:       getEnvAddressListByPrefix(vgpuEnvPrefix),
+		EmulatorThreadCpu: emulatorThreadCpu,
+	}
+	if options != nil && options.VirtualMachineSMBios != nil {
+		c.SMBios = options.VirtualMachineSMBios
+	}
+	if err := api.Convert_v1_VirtualMachine_To_api_Domain(vmi, domain, c); err != nil {
+		logger.Error("Conversion failed.")
+		return nil, err
+	}
+
+	// Set defaults which are not coming from the cluster
+	api.SetObjectDefaults_Domain(domain)
+
+	dom, err := l.virConn.LookupDomainByName(domain.Spec.Name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find domain by name: %+v", err)
+	}
+	defer dom.Free()
+	domState, _, err := dom.GetState()
+	if err != nil {
+		logger.Reason(err).Error("Getting the domain state failed.")
+		return nil, err
+	}
+
+	err = network.SetupNetworkInterfacesPhase2(vmi, domain)
+	if err != nil {
+		return nil, fmt.Errorf("preparing the pod network failed: %v", err)
+	}
+	logger.Reason(nil).Error("Configure phase2.")
+
+	if cli.IsDown(domState) {
 		dom, err = l.setDomainSpecWithHooks(vmi, &domain.Spec)
 		if err != nil {
 			return nil, err
